@@ -36,16 +36,26 @@ class RegisterRequest extends FormRequest
         $rules = [
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required'
+            'password' => 'nullable|string|min:6',
+            'role_id' => 'required|exists:Roles,id'
         ];
+        if ($this->isMethod('post')) {
+            $rules['password'] = 'required|string|min:6';
+        }
         return $rules;
     }
 
     public function messages()
     {
-        return [
-            'email.required' => 'emailiňizi hokmany girizmeli!',
-            'password.required' => 'gizlin sözüňizi hökman giriziň!',
+        $messages = [
+            'email.required' => 'Вы должны обязательно ввести свою электронную почту!',
+            'password.required' => 'Вы должны обязательно ввести свой пароль!',
         ];
+
+        if ($this->isMethod('post')) {
+            $messages['password.required'] = 'Вы должны обязательно ввести свой пароль!';
+        }
+
+        return $messages;
     }
 }

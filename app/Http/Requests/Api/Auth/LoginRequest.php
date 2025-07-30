@@ -35,7 +35,7 @@ class LoginRequest extends FormRequest
     {
         $rules = [
             'email' => 'required|email',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:6',
         ];
         return $rules;
     }

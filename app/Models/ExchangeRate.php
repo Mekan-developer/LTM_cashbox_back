@@ -10,6 +10,8 @@ class ExchangeRate extends Model
     use HasFactory;
     protected $fillable = ['currency_code', 'rate', 'date'];
 
+    protected $casts = ['date' => 'date'];
+
     public function currency()
     {
         return $this->belongsTo(Currency::class, 'currency_code', 'code');

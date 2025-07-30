@@ -36,8 +36,10 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
+            'name' => 'required|string|max:255',
             'email' => 'required|email',
             'password' => 'required|string|min:6',
+            'role_id' => 'required|exists:Roles,id'
         ];
         return $rules;
     }

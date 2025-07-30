@@ -24,6 +24,7 @@ class Record extends Model
 
     protected $casts = [
         'is_debt' => 'boolean',
+        'type' => 'boolean',
         'date' => 'date',
     ];
 

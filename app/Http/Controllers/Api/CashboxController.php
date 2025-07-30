@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\CashboxRepository;
 use App\Http\Requests\Api\CashboxRequest;
+use App\Http\Resources\Cashbox\IndexResource as CashboxIndexResource;
 use App\Models\Cashbox;
+use App\Services\CashboxService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CashboxController extends Controller
 {
@@ -13,26 +17,23 @@ class CashboxController extends Controller
      * Display a listing of the resource.
      */
 
-    // Получить все кассы
-    public function index()
+    // Получить все кассы 
+    public function index(CashboxRepository $cashboxRepository)
     {
-        return Cashbox::with('currency', 'users')->get();
+        $data = CashboxIndexResource::collection($cashboxRepository->getCashboxs())->resolve();
+        return response()->json($data);
     }
 
     /**
      * Store a newly created resource in storage.
      */
     // Создать новую кассу
-    public function store(CashboxRequest $request)
+    public function store(CashboxRequest $request, CashboxService $service)
     {
-        $validated = $request->validated();
-        $cashbox = Cashbox::create($validated);
+        $cashbox = $service->createCashbox($request->validated());
 
-        if (!empty($request['user_ids'])) {
-            $cashbox->users()->sync($request['user_ids']);
-        }
-
-        return response()->json($cashbox->load('currency', 'users'), 201);
+        Log::info('test cashbox --------------  :' . $cashbox);
+        return new CashboxIndexResource($cashbox);
     }
 
     /**

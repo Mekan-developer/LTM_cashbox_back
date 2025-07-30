@@ -9,14 +9,14 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RecordRequest extends FormRequest
 {
-    // protected function failedValidation(Validator $validator)
-    // {
-    //     throw new HttpResponseException(response()->json([
-    //         'success' => false,
-    //         'message' => 'Validation failed',
-    //         'errors' => $validator->errors(),
-    //     ], 422));
-    // }
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $validator->errors(),
+        ], 422));
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -36,7 +36,7 @@ class RecordRequest extends FormRequest
         return [
             'article_type' => 'nullable|string',
             'cashbox_id' => 'required|exists:cashboxes,id',
-            'type' => 'required|in:income,expense',
+            'type' => 'required|boolean',
             'original_amount' => 'required|numeric|min:0',
             'original_currency' => 'required|string',
             'date' => 'required|date',

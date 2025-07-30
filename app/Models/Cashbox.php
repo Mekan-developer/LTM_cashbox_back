@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Cashbox extends Model
 {
     protected $fillable = ['title', 'currency_id', 'description'];
+    protected $hidden = ['created_at', 'updated_at'];
 
     public function currency()
     {
