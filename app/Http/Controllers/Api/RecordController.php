@@ -20,10 +20,7 @@ class RecordController extends Controller
     {
         $records = $this->service->getRecords();
 
-        return response()->json([
-            'data' => $records,
-            'message' => 'data recived successfully!'
-        ]);
+        return response()->json($records);
     }
 
     public function store(RecordRequest $request)

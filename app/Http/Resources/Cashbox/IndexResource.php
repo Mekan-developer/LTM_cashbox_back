@@ -3,8 +3,6 @@
 namespace App\Http\Resources\Cashbox;
 
 use App\Http\Resources\Currency\IndexResource as CurrencyIndexResource;
-use App\Http\Resources\Record\IndexResource as RecordIndexResource;
-use App\Http\Resources\User\IndexResource as UserIndexResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,6 +18,7 @@ class IndexResource extends JsonResource
     {
 
         $data = [
+            'id' => $this->id,
             'title' => $this->title,
             'currency_id' => $this->currency_id,
             'description' => $this->description,

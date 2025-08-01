@@ -31,8 +31,6 @@ class CashboxController extends Controller
     public function store(CashboxRequest $request, CashboxService $service)
     {
         $cashbox = $service->createCashbox($request->validated());
-
-        Log::info('test cashbox --------------  :' . $cashbox);
         return new CashboxIndexResource($cashbox);
     }
 

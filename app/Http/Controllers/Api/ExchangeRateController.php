@@ -15,11 +15,17 @@ class ExchangeRateController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'currency_code' => 'required|string',
             'rate' => 'required|numeric',
             'date' => 'nullable|date',
         ]);
+
+
+
+
+
 
         return ExchangeRate::create($request->all());
     }

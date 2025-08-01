@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CashboxController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\ExchangeRateController;
 use App\Http\Controllers\Api\RecordController;
+use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/users/{user}/edit', [AuthController::class, 'edit']);
     Route::patch('/users/{user}', [AuthController::class, 'update']);
+    Route::get('/users', [AuthController::class, 'users']);
     Route::delete('/users/{user}', [AuthController::class, 'destroy']);
 
 
@@ -31,6 +33,10 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::apiResource('records', RecordController::class);
     Route::get('/analytics', [AnalyticsController::class, 'index']);
     Route::get('/analytics/summary', [AnalyticsController::class, 'summary']);
+
+
+    Route::get('/roles', [RoleController::class, 'index']);
+
 
 
     // сюда позже добавим Excel экспорт и аналитику

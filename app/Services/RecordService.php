@@ -8,6 +8,8 @@ use App\Models\Cashbox;
 use App\Models\ExchangeRate;
 use App\Models\Record;
 use App\Repositories\CashboxRepository;
+use Illuminate\Support\Facades\Log as FacadesLog;
+use Log;
 
 class RecordService
 {
@@ -53,16 +55,12 @@ class RecordService
         }
         //wichislenie amount end
 
-
-        // Расчёт суммы в валюте кассы
-        // $amount = $request['original_amount'] * $rate;
         $validated = $request->validated();
         $validated['currency'] = $cashboxCurrencyCode;
         $validated['exchange_rate'] = $cashboxCurrencyRate;
         $validated['amount'] = $convertedAmount;
         $record = Record::create($validated);
         $recordWithCashbox = $record->load('cashbox');
-
 
         return $recordWithCashbox;
     }
