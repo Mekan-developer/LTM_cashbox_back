@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('exchange_rates', function (Blueprint $table) {
             $table->id();
             $table->string('currency_code');
-            $table->decimal('rate', 15, 2);
+            $table->decimal('rate', 15, 2)->default(0);
             $table->date('date')->nullable();
             $table->timestamps();
         });

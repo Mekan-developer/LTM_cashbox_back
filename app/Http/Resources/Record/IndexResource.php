@@ -16,6 +16,7 @@ class IndexResource extends JsonResource
     public function toArray(Request $request): array
     {
         $data = [
+            'id' => $this->id,
             'cashbox_id' => $this->cashbox_id,
             'type' => $this->type == 1 ? 'income' : 'expense',
             'is_debt' => $this->is_debt,

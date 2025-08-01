@@ -8,12 +8,19 @@ use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Resources\User\IndexResource;
 use App\Models\User;
 use App\Services\AuthService;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+
+    public function users()
+    {
+        $users = User::whereDoesntHave('roles', function ($query) {
+            $query->where('title', 'admin');
+        })->with('roles')->get();
+
+        return response()->json($users);
+    }
+
 
     public function register(RegisterRequest $request, AuthService $service)
     {
