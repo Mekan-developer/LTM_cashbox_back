@@ -9,6 +9,7 @@ use App\Http\Resources\Cashbox\IndexResource as CashboxIndexResource;
 use App\Models\Cashbox;
 use App\Services\CashboxService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CashboxController extends Controller
@@ -50,15 +51,16 @@ class CashboxController extends Controller
     // Обновить кассу
     public function update(Request $request, Cashbox $cashbox)
     {
+
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'currency_id' => 'sometimes|exists:currencies,id',
             'description' => 'nullable|string',
             'user_ids' => 'nullable|array'
         ]);
-
         $cashbox->update($validated);
 
+        $validated['user_ids'] = Auth::id();
         if (isset($validated['user_ids'])) {
             $cashbox->users()->sync($validated['user_ids']);
         }

@@ -24,7 +24,7 @@ class CashboxRepository
         return Cashbox::create($data);
     }
 
-    public function attachUsers(Cashbox $cashbox, array $userIds): void
+    public function attachUsers(Cashbox $cashbox, int $userIds): void
     {
         $cashbox->users()->sync($userIds);
     }

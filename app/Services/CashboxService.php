@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cashbox;
 use App\Repositories\CashboxRepository;
+use Illuminate\Support\Facades\Auth;
 
 class CashboxService
 {
@@ -11,9 +12,7 @@ class CashboxService
 
     public function createCashbox(array $data): Cashbox
     {
-        $userIds = $data['user_ids'] ?? [];
-        unset($data['user_ids']);
-
+        $userIds = Auth::id();
         $cashbox = $this->repository->create($data);
         if (!empty($userIds)) {
             $this->repository->attachUsers($cashbox, $userIds);

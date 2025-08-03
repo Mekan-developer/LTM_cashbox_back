@@ -21,13 +21,22 @@ class ExchangeRateController extends Controller
             'rate' => 'required|numeric',
             'date' => 'nullable|date',
         ]);
-
-
-
-
-
-
         return ExchangeRate::create($request->all());
+    }
+
+    public function update(request $request, ExchangeRate $exchangeRate)
+    {
+        $request->validate([
+            'rate' => 'required|numeric',
+        ]);
+        $exchangeRate->rate = $request->input('rate');
+        $exchangeRate->date = now();
+        $exchangeRate->save();
+
+        return response()->json([
+            'message' => 'Exchange rate updated successfully',
+            'data' => $exchangeRate,
+        ]);
     }
 
     public function destroy(ExchangeRate $exchangeRate)
