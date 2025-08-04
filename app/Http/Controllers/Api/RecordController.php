@@ -25,11 +25,14 @@ class RecordController extends Controller
 
     public function store(RecordRequest $request)
     {
-        $storedRecord = $this->service->storeRecord($request);
-        $storedRecord = new IndexResource($storedRecord);
-        $storedRecordWithCashbox = $storedRecord->resolve();
+        $this->service->storeRecord($request);
+        return response()->json('record created successfully', 201);
+    }
 
-        return response()->json($storedRecordWithCashbox);
+    public function update(RecordRequest $request, Record $record)
+    {
+        $updateRecord = $this->service->updateRecord($request, $record);
+        return response()->json('Record updated successfully', 204);
     }
 
     public function show(Record $record)

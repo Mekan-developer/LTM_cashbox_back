@@ -74,6 +74,7 @@ class CashboxController extends Controller
     // Удалить кассу
     public function destroy(Cashbox $cashbox)
     {
+        Log::info('delllllelelelllleleetetete:');
         $cashbox->delete();
         return response()->json(['message' => 'Касса удалена']);
     }

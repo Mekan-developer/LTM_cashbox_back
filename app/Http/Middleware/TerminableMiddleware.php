@@ -28,6 +28,6 @@ class TerminableMiddleware
             'time' => now(),
         ];
 
-        FacadesLog::info('Завершённый запрос:', $log);
+        // FacadesLog::info('Завершённый запрос:', $log);
     }
 }
