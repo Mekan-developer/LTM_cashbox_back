@@ -21,17 +21,18 @@ Route::controller(AuthController::class)->group(function () {
 Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/users/{user}/edit', [AuthController::class, 'edit']);
-    Route::patch('/users/{user}', [AuthController::class, 'update']);
-    Route::get('/users', [AuthController::class, 'users']);
-    Route::delete('/users/{user}', [AuthController::class, 'destroy']);
+
+    Route::get('/users', [UserController::class, 'users']);
+    Route::patch('/users/{user}', [UserController::class, 'update']);
+    Route::get('/users/{user}/edit', [UserController::class, 'edit']);
+    Route::delete('/users/{user}', [UserController::class, 'destroy']);
 
 
     Route::apiResource('exchange-rates', ExchangeRateController::class);
     Route::apiResource('cashboxes', CashboxController::class);
     Route::apiResource('currencies', CurrencyController::class);
     Route::apiResource('records', RecordController::class);
-    Route::get('/analytics', [AnalyticsController::class, 'index']);
+    // Route::get('/analytics', [AnalyticsController::class, 'index']);
     Route::get('/analytics/summary', [AnalyticsController::class, 'summary']);
 
 

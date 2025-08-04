@@ -23,8 +23,6 @@ class IndexResource extends JsonResource
             'currency_id' => $this->currency_id,
             'description' => $this->description,
             'currency' => new CurrencyIndexResource($this->currency),
-            // 'users' => new UserIndexResource($this->users),
-            // 'records' => RecordIndexResource::collection($this->records),
         ];
         return $data;
     }

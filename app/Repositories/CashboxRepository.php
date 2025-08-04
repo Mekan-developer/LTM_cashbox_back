@@ -19,13 +19,30 @@ class CashboxRepository
         return $cashbox;
     }
 
-    public function create(array $data): Cashbox
+    public function create(Object $dto): Cashbox
     {
-        return Cashbox::create($data);
+        return Cashbox::create([
+            'title' => $dto->title,
+            'currency_id' => $dto->currency_id,
+            'description' => $dto->description
+        ]);
+    }
+    public function updateCashbox($cashbox, $dto)
+    {
+        $cashbox->update([
+            'title' => $dto->title,
+            'currency_id' => $dto->currency_id,
+            'description' => $dto->description
+        ]);
     }
 
     public function attachUsers(Cashbox $cashbox, int $userIds): void
     {
         $cashbox->users()->sync($userIds);
+    }
+
+    public function getCashboxByCurrencyRecord($cashbox)
+    {
+        return $cashbox->load('currency', 'users', 'records');
     }
 }

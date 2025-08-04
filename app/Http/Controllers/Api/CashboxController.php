@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTOs\CashboxDTO;
 use App\Http\Controllers\Controller;
 use App\Repositories\CashboxRepository;
 use App\Http\Requests\Api\CashboxRequest;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Log;
 
 class CashboxController extends Controller
 {
+
+    public function __construct(protected CashboxService $service) {}
     /**
      * Display a listing of the resource.
      */
@@ -29,10 +32,15 @@ class CashboxController extends Controller
      * Store a newly created resource in storage.
      */
     // Создать новую кассу
-    public function store(CashboxRequest $request, CashboxService $service)
+    public function store(CashboxRequest $request)
     {
-        $cashbox = $service->createCashbox($request->validated());
-        return new CashboxIndexResource($cashbox);
+        $dto = new CashboxDTO($request->validated());
+
+        $this->service->createCashbox($dto);
+
+        return response()->json([
+            'message' => 'Пользователь created успешно.'
+        ], 200);
     }
 
     /**
@@ -42,30 +50,22 @@ class CashboxController extends Controller
     // Получить одну кассу
     public function show(Cashbox $cashbox)
     {
-        return $cashbox->load('currency', 'users', 'records');
+        $data = $this->service->getCashbox($cashbox);
+        return response()->json($data, 201);
     }
 
     /**
      * Update the specified resource in storage.
      */
     // Обновить кассу
-    public function update(Request $request, Cashbox $cashbox)
+    public function update(CashboxRequest $request, Cashbox $cashbox)
     {
+        $dto = new CashboxDTO($request->validated());
+        $this->service->updateCashbox($dto, $cashbox);
 
-        $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'currency_id' => 'sometimes|exists:currencies,id',
-            'description' => 'nullable|string',
-            'user_ids' => 'nullable|array'
-        ]);
-        $cashbox->update($validated);
-
-        $validated['user_ids'] = Auth::id();
-        if (isset($validated['user_ids'])) {
-            $cashbox->users()->sync($validated['user_ids']);
-        }
-
-        return response()->json($cashbox->load('currency', 'users'));
+        return response()->json([
+            'message' => 'user updated succeffully!.'
+        ], 200);
     }
 
     /**
@@ -74,8 +74,9 @@ class CashboxController extends Controller
     // Удалить кассу
     public function destroy(Cashbox $cashbox)
     {
-        Log::info('delllllelelelllleleetetete:');
         $cashbox->delete();
-        return response()->json(['message' => 'Касса удалена']);
+        return response()->json([
+            'message' => 'Пользователь удалён успешно.'
+        ], 200);
     }
 }

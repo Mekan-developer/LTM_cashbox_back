@@ -6,7 +6,6 @@ use App\Http\Resources\User\IndexResource;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use PhpParser\Node\Expr\Cast\Object_;
 
 class AuthRepository
 {
@@ -26,9 +25,9 @@ class AuthRepository
         return Role::find($roleId);
     }
 
-    public function findByEmail(array $data): User
+    public function findByEmail(String $email): User
     {
-        return User::where('email', $data['email'])->first();
+        return User::where('email', $email)->first();
     }
 
     public function getAuthUserWithRole()
