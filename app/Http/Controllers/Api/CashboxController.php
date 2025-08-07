@@ -10,8 +10,6 @@ use App\Http\Resources\Cashbox\IndexResource as CashboxIndexResource;
 use App\Models\Cashbox;
 use App\Services\CashboxService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class CashboxController extends Controller
 {
@@ -22,10 +20,13 @@ class CashboxController extends Controller
      */
 
     // Получить все кассы 
-    public function index(CashboxRepository $cashboxRepository)
+    public function index(CashboxRepository $cashboxRepository, Request $request)
     {
-        $data = CashboxIndexResource::collection($cashboxRepository->getCashboxs())->resolve();
-        return response()->json($data);
+        $perPage = $request->get('perPage', 15);
+        $paginated = $cashboxRepository->getCashboxsPaginated($perPage);
+        $items = CashboxIndexResource::collection($paginated)->resolve();
+
+        return response()->json($items);
     }
 
     /**

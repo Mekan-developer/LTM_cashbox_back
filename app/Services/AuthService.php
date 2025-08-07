@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
+use App\Http\Resources\User\IndexResource;
 use App\Models\User;
 use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
 {
@@ -21,7 +24,7 @@ class AuthService
             'email' => $dto->email,
             'password' => $dto->password
         ]);
-        $token = $user->createToken('api_token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         // Назначаем роль
         $role = $this->repository->getRoleById($dto->role_id);
@@ -39,23 +42,54 @@ class AuthService
     public function loginUser(Object $dto): array
     {
 
-        if (!Auth::attempt([
-            'email' => $dto->email,
-            'password' => $dto->password,
-        ])) {
-            throw ValidationException::withMessages([
-                'email' => ['Неверный логин или пароль'],
-            ]);
-        }
-        $user = Auth::user();
-        $token = $user->createToken('api_token')->plainTextToken;
+        $credentials =
+            [
+                'email' => $dto->email,
+                'password' => $dto->password,
+            ];
 
-        return [
-            'user' => $user,
-            'token' => $token,
-            'message' => 'Успешный вход',
-        ];
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return [
+                ['error' => 'Unauthorized'],
+                401
+            ];
+        }
+
+        $refreshToken = JWTAuth::claims(['typ' => 'refresh'])->fromUser(Auth::user()); // 30 дней
+        return $this->respondWithToken($token, $refreshToken);
     }
+
+    public function refreshToken($request)
+    {
+        try {
+            $refreshToken = $request->cookie('refresh_token');
+
+            if (!$refreshToken) {
+                return response()->json(['error' => 'Нет refresh токена'], 401);
+            }
+
+            // получить нового access token и нового refresh token
+            $newAccessToken = JWTAuth::setToken($refreshToken)->refresh(true, true);
+            $newRefreshToken = JWTAuth::claims(['typ' => 'refresh'])->fromUser(auth()->user());
+
+            return response()->json([
+                'success' => true,
+                'user' => new IndexResource(Auth::user()),
+                'token' => $newAccessToken,
+                'token_type' => 'bearer',
+                'expires_in' => JWTAuth::factory()->getTTL() * 60
+            ])->withCookie(
+                cookie('refresh_token', $newRefreshToken, 43200, '/', null, true, true, false, 'None')
+            );
+        } catch (JWTException $e) {
+            return response()->json([
+                'error' => 'Ошибка обновления',
+                'message' => $e->getMessage()
+            ], 401);
+        }
+    }
+
+
 
     public function authUserWithRole()
     {
@@ -69,13 +103,25 @@ class AuthService
 
     public function logoutAuthUser(): array
     {
-        $user = $this->repository->getAuthUser();
-
         try {
-            $user->tokens()->delete();
-            return ['message' => 'Вы вышли из системы'];
-        } catch (\Exception $e) {
-            return ['message' => 'Ошибка при выходе из системы'];
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return ['message' => 'Выход выполнен'];
+        } catch (JWTException $e) {
+            return ['error' => 'Ошибка выхода'];
         }
+    }
+
+    protected function respondWithToken($token, $refreshToken = null)
+    {
+        return [
+            'data' => [
+                'success' => true,
+                'user' => new IndexResource(Auth::user()),
+                'token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => JWTAuth::factory()->getTTL()
+            ],
+            'cookie' => cookie('refresh_token', $refreshToken, 43200, '/', null, true, true, false, 'None')
+        ];
     }
 }

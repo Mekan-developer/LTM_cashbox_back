@@ -7,13 +7,13 @@ use App\Models\Cashbox;
 
 class CashboxRepository
 {
-    public function getCashboxs()
+    public function getCashboxsPaginated($perPage = 15)
     {
-        $cashboxes = Cashbox::with(['currency', 'users', 'records'])->get();
+        $cashboxes = Cashbox::with(['currency', 'users', 'records'])->paginate($perPage);
         return $cashboxes;
     }
 
-    public function getCashboxById($id): object
+    public function getCashboxById($id): Object
     {
         $cashbox = Cashbox::findOrFail($id);
         return $cashbox;

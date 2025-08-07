@@ -8,25 +8,36 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Services\AuthService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
     public function __construct(protected AuthService $service) {}
 
 
-    public function register(RegisterRequest $request, AuthService $service)
+    public function register(RegisterRequest $request)
     {
         $dto = new RegisterDTO($request->validated());
-        $result = $service->createUser($dto);
+        $result = $this->service->createUser($dto);
         return response()->json($result, 200);
     }
 
-    public function login(LoginRequest $request, AuthService $service)
+    public function login(LoginRequest $request)
     {
         $dto = new LoginDTO($request->validated());
-        $result = $service->loginUser($dto);
-        return response()->json($result, 200);
+        $result = $this->service->loginUser($dto);
+        return response()->json($result['data'], 201)->withCookie($result['cookie']);
     }
+
+    // 🔁 Refresh
+    public function refresh(Request $request)
+    {
+        Log::info('back end');
+        return $this->service->refreshToken($request); // установить новый refresh token
+    }
+
 
     public function me(AuthService $service)
     {
@@ -38,9 +49,8 @@ class AuthController extends Controller
     {
         $result = $service->logoutAuthUser();
 
-        // Можно добавить проверку по сообщению:
-        $status = $result['message'] === 'Вы вышли из системы' ? 200 : 500;
-
-        return response()->json($result, $status);
+        return response()->json($result)->withCookie(
+            cookie()->forget('refresh_token')
+        );
     }
 }
